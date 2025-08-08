@@ -137,17 +137,31 @@ class Adminer {
 
 	/** Print login form */
 	function loginForm(): void {
+		// Database URL section
+		echo "<fieldset style='margin: 0 0 1em 0;'><legend>Quick Connect with Database URL</legend>\n";
+		echo "<table class='layout'>\n";
+		echo "<tr><th>Database URL<td><input name='database_url' id='database_url' placeholder='postgresql://user:pass@host:port/dbname' style='width: 300px;' autocapitalize='off'>\n";
+		echo "<tr><td colspan='2'><small style='color: #777;'>Supports: postgresql://, postgres://, postgre://, mysql://, sqlite://, mssql://</small>\n";
+		echo "</table>\n";
+		echo "<p><input type='submit' value='" . lang('Login') . "' id='url-login-btn'></p>\n";
+		echo "</fieldset>\n";
+		
+		echo "<br>\n";
+		
+		// Traditional form section
+		echo "<fieldset><legend>Manual Connection</legend>\n";
 		echo "<table class='layout'>\n";
 		// this is matched by compile.php
 		echo adminer()->loginFormField('driver', '<tr><th>' . lang('System') . '<td>', html_select("auth[driver]", SqlDriver::$drivers, DRIVER, "loginDriver(this);"));
 		echo adminer()->loginFormField('server', '<tr><th>' . lang('Server') . '<td>', '<input name="auth[server]" value="' . h(SERVER) . '" title="hostname[:port]" placeholder="localhost" autocapitalize="off">');
 		// this is matched by compile.php
-		echo adminer()->loginFormField('username', '<tr><th>' . lang('Username') . '<td>', '<input name="auth[username]" id="username" autofocus value="' . h($_GET["username"]) . '" autocomplete="username" autocapitalize="off">' . script("const authDriver = qs('#username').form['auth[driver]']; authDriver && authDriver.onchange();"));
+		echo adminer()->loginFormField('username', '<tr><th>' . lang('Username') . '<td>', '<input name="auth[username]" id="username" value="' . h($_GET["username"]) . '" autocomplete="username" autocapitalize="off">' . script("const authDriver = qs('#username').form['auth[driver]']; authDriver && authDriver.onchange();"));
 		echo adminer()->loginFormField('password', '<tr><th>' . lang('Password') . '<td>', '<input type="password" name="auth[password]" autocomplete="current-password">');
 		echo adminer()->loginFormField('db', '<tr><th>' . lang('Database') . '<td>', '<input name="auth[db]" value="' . h($_GET["db"]) . '" autocapitalize="off">');
 		echo "</table>\n";
 		echo "<p><input type='submit' value='" . lang('Login') . "'>\n";
-		echo checkbox("auth[permanent]", 1, $_COOKIE["adminer_permanent"], lang('Permanent login')) . "\n";
+		echo checkbox("auth[permanent]", 1, $_COOKIE["adminer_permanent"], lang('Permanent login')) . "</p>\n";
+		echo "</fieldset>\n";
 	}
 
 	/** Get login form field

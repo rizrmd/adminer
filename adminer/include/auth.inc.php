@@ -60,6 +60,45 @@ function check_invalid_login(array &$permanent): void {
 	}
 }
 
+// Parse database URL if provided
+if (isset($_POST["database_url"]) && $_POST["database_url"]) {
+	$url = $_POST["database_url"];
+	// Parse URL format: protocol://username:password@host:port/database
+	if (preg_match('#^(\w+)://([^:]+):([^@]*)@([^:/]+)(?::(\d+))?/(.+)$#', $url, $matches)) {
+		$protocol = $matches[1];
+		$username = urldecode($matches[2]);
+		$password = urldecode($matches[3]);
+		$host = $matches[4];
+		$port = $matches[5] ?? '';
+		$database = urldecode($matches[6]);
+		
+		// Map protocol to driver
+		$driver_map = array(
+			'postgresql' => 'pgsql',
+			'postgres' => 'pgsql',
+			'postgre' => 'pgsql',
+			'mysql' => 'mysql',
+			'mariadb' => 'mysql',
+			'sqlite' => 'sqlite',
+			'sqlite3' => 'sqlite',
+			'mssql' => 'mssql',
+			'sqlserver' => 'mssql'
+		);
+		
+		$driver = $driver_map[$protocol] ?? $protocol;
+		
+		// Set auth array from parsed URL
+		$_POST["auth"] = array(
+			'driver' => $driver,
+			'server' => $host . ($port ? ':' . $port : ''),
+			'username' => $username,
+			'password' => $password,
+			'db' => $database,
+			'permanent' => $_POST["auth"]["permanent"] ?? ''
+		);
+	}
+}
+
 $auth = $_POST["auth"];
 if ($auth) {
 	session_regenerate_id(); // defense against session fixation
