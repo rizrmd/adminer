@@ -97,6 +97,9 @@ if (isset($_POST["database_url"]) && $_POST["database_url"]) {
 			'db' => $database,
 			'permanent' => $_POST["auth"]["permanent"] ?? ''
 		);
+		
+		// Remove database_url from POST to fix count check
+		unset($_POST["database_url"]);
 	}
 }
 
@@ -117,7 +120,7 @@ if ($auth) {
 		cookie("adminer_permanent", implode(" ", $permanent));
 	}
 	if (
-		count($_POST) == 1 // 1 - auth
+		(count($_POST) == 1 || (count($_POST) == 2 && isset($_POST["token"]))) // 1 - auth, or 2 - auth + token
 		|| DRIVER != $vendor
 		|| SERVER != $server
 		|| $_GET["username"] !== $username // "0" == "00"
