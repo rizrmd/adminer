@@ -195,7 +195,7 @@ function auth_error(string $error, array &$permanent) {
 	page_header(lang('Login'), $error, null);
 	echo "<form action='' method='post'>\n";
 	echo "<div>";
-	if (hidden_fields($_POST, array("auth"))) { // expired session
+	if (hidden_fields($_POST, array("auth", "database_url", "token"))) { // expired session - exclude login-related fields
 		echo "<p class='message'>" . lang('The action will be performed after successful login with the same credentials.') . "\n";
 	}
 	echo "</div>\n";
