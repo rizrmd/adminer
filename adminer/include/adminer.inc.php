@@ -138,13 +138,15 @@ class Adminer {
 	/** Print login form */
 	function loginForm(): void {
 		// Database URL form with JavaScript handler
+		echo "<form id='database-url-form' onsubmit='parseAndSubmitUrl(); return false;'>\n";
 		echo "<fieldset style='margin: 0 0 1em 0;'><legend>Quick Connect with Database URL</legend>\n";
 		echo "<table class='layout'>\n";
 		echo "<tr><th>Database URL<td><input name='database_url' id='database_url' placeholder='postgresql://user:pass@host:port/dbname' style='width: 300px;' autocapitalize='off'>\n";
 		echo "<tr><td colspan='2'><small style='color: #777;'>Supports: postgresql://, postgres://, postgre://, mysql://, sqlite://, mssql://</small>\n";
 		echo "</table>\n";
-		echo "<p><input type='button' value='" . lang('Login') . "' id='url-login-btn' onclick='parseAndSubmitUrl()'></p>\n";
+		echo "<p><button type='submit'>" . lang('Login') . "</button></p>\n";
 		echo "</fieldset>\n";
+		echo "</form>\n";
 		
 		echo "<br>\n";
 		
@@ -165,7 +167,7 @@ class Adminer {
 		
 		// JavaScript to parse database URL and populate manual form
 		echo script("
-			function parseAndSubmitUrl() {
+			window.parseAndSubmitUrl = function() {
 				var urlInput = document.getElementById('database_url');
 				var url = urlInput.value.trim();
 				
