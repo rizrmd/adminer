@@ -1,0 +1,3 @@
+[tools]
+"ubi:adwinying/php" = "latest"
+"ubi:composer/composer" = "latest"

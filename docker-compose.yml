@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  adminer:
+    build: .
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    environment:
+      - APACHE_LOG_DIR=/var/log/apache2
+      - APACHE_RUN_DIR=/var/run/apache2
+      - APACHE_PID_FILE=/var/run/apache2/apache2.pid
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
+    # Uncomment for development/debugging
+    # volumes:
+    #   - ./adminer:/var/www/html:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/index.php"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

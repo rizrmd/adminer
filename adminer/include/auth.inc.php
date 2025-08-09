@@ -153,14 +153,12 @@ function auth_error(string $error, array &$permanent) {
 		$_SESSION["token"] = rand(1, 1e6); // this is for next attempt
 	}
 	page_header(lang('Login'), $error, null);
-	echo "<form action='' method='post'>\n";
 	echo "<div>";
 	if (hidden_fields($_POST, array("auth"))) { // expired session
 		echo "<p class='message'>" . lang('The action will be performed after successful login with the same credentials.') . "\n";
 	}
 	echo "</div>\n";
 	adminer()->loginForm();
-	echo "</form>\n";
 	page_footer("auth");
 	exit;
 }
