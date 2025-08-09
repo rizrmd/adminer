@@ -137,18 +137,26 @@ class Adminer {
 
 	/** Print login form */
 	function loginForm(): void {
-		// Database URL section
+		// This function is called from auth.inc.php which already wraps it in a form
+		// We'll close that form and create our own forms
+		echo "</form>\n"; // Close the form opened in auth.inc.php
+		
+		// Database URL form - separate form
+		echo "<form action='' method='post'>\n";
 		echo "<fieldset style='margin: 0 0 1em 0;'><legend>Quick Connect with Database URL</legend>\n";
 		echo "<table class='layout'>\n";
 		echo "<tr><th>Database URL<td><input name='database_url' id='database_url' placeholder='postgresql://user:pass@host:port/dbname' style='width: 300px;' autocapitalize='off'>\n";
 		echo "<tr><td colspan='2'><small style='color: #777;'>Supports: postgresql://, postgres://, postgre://, mysql://, sqlite://, mssql://</small>\n";
 		echo "</table>\n";
-		echo "<p><input type='submit' value='" . lang('Login') . "' id='url-login-btn' onclick='return handleUrlLogin()'></p>\n";
+		echo "<p><input type='submit' value='" . lang('Login') . "' id='url-login-btn'></p>\n";
+		echo input_token(); // Add CSRF token
 		echo "</fieldset>\n";
+		echo "</form>\n";
 		
 		echo "<br>\n";
 		
-		// Traditional form section
+		// Manual connection form - separate form
+		echo "<form action='' method='post'>\n";
 		echo "<fieldset><legend>Manual Connection</legend>\n";
 		echo "<table class='layout'>\n";
 		// this is matched by compile.php
@@ -161,26 +169,12 @@ class Adminer {
 		echo "</table>\n";
 		echo "<p><input type='submit' value='" . lang('Login') . "'>\n";
 		echo checkbox("auth[permanent]", 1, $_COOKIE["adminer_permanent"], lang('Permanent login')) . "</p>\n";
+		echo input_token(); // Add CSRF token
 		echo "</fieldset>\n";
+		echo "</form>\n";
 		
-		// JavaScript to handle database URL submission
-		echo script("
-			function handleUrlLogin() {
-				var urlInput = document.getElementById('database_url');
-				if (urlInput && urlInput.value.trim()) {
-					// Clear manual form fields when using database URL
-					var form = urlInput.form;
-					var authFields = ['auth[driver]', 'auth[server]', 'auth[username]', 'auth[password]', 'auth[db]'];
-					authFields.forEach(function(fieldName) {
-						var field = form[fieldName];
-						if (field) {
-							field.disabled = true;
-						}
-					});
-				}
-				return true;
-			}
-		");
+		// Re-open a dummy form to match the closing </form> in auth.inc.php
+		echo "<form style='display:none'>";
 	}
 
 	/** Get login form field
