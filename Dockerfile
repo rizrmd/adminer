@@ -1,5 +1,8 @@
 FROM php:8.2-apache
 
+# Cache busting - change this value to force rebuild
+ARG CACHEBUST=1
+
 # Install PostgreSQL, MySQL, SQLite and other database drivers
 RUN apt-get update && apt-get install -y \
     libpq-dev \
@@ -22,12 +25,16 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
     echo "upload_max_filesize = 50M" >> "$PHP_INI_DIR/php.ini" && \
     echo "memory_limit = 256M" >> "$PHP_INI_DIR/php.ini" && \
     echo "max_execution_time = 600" >> "$PHP_INI_DIR/php.ini" && \
-    echo "max_input_time = 600" >> "$PHP_INI_DIR/php.ini"
+    echo "max_input_time = 600" >> "$PHP_INI_DIR/php.ini" && \
+    echo "opcache.enable=0" >> "$PHP_INI_DIR/php.ini"
 
 # Configure Apache for production
 RUN echo "ServerTokens Prod" >> /etc/apache2/apache2.conf && \
     echo "ServerSignature Off" >> /etc/apache2/apache2.conf && \
     echo "TraceEnable Off" >> /etc/apache2/apache2.conf
+
+# Clear any existing files first
+RUN rm -rf /var/www/html/*
 
 # Copy Adminer files
 COPY --chown=www-data:www-data adminer/ /var/www/html/
