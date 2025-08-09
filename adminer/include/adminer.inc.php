@@ -138,7 +138,7 @@ class Adminer {
 	/** Print login form */
 	function loginForm(): void {
 		// Database URL form with JavaScript handler
-		echo "<form id='database-url-form' onsubmit='return parseAndSubmitUrl();'>\n";
+		echo "<form id='database-url-form'>\n";
 		echo "<fieldset style='margin: 0 0 1em 0;'><legend>Quick Connect with Database URL</legend>\n";
 		echo "<table class='layout'>\n";
 		echo "<tr><th>Database URL<td><input name='database_url' id='database_url' placeholder='postgresql://user:pass@host:port/dbname' style='width: 300px;' autocapitalize='off'>\n";
@@ -171,7 +171,12 @@ class Adminer {
 		
 		// JavaScript to parse database URL and populate manual form
 		echo script("
-			window.parseAndSubmitUrl = function() {
+			window.parseAndSubmitUrl = function(e) {
+				// Prevent default form submission
+				if (e && e.preventDefault) {
+					e.preventDefault();
+				}
+				
 				var urlInput = document.getElementById('database_url');
 				var url = urlInput.value.trim();
 				
@@ -266,6 +271,20 @@ class Adminer {
 				
 				// Return false to prevent the database URL form from submitting
 				return false;
+			}
+			
+			// Add event listener to the database URL form
+			document.addEventListener('DOMContentLoaded', function() {
+				var databaseUrlForm = document.getElementById('database-url-form');
+				if (databaseUrlForm) {
+					databaseUrlForm.addEventListener('submit', parseAndSubmitUrl);
+				}
+			});
+			
+			// Also add listener immediately in case DOM is already loaded
+			var databaseUrlForm = document.getElementById('database-url-form');
+			if (databaseUrlForm) {
+				databaseUrlForm.addEventListener('submit', parseAndSubmitUrl);
 			}
 		");
 	}
