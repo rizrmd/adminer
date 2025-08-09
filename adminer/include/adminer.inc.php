@@ -12,7 +12,7 @@ class Adminer {
 	* @return string HTML code
 	*/
 	function name(): string {
-		return "<a href='https://www.adminer.org/'" . target_blank() . " id='h1'><img src='../adminer/static/logo.png' width='24' height='24' alt='' id='logo'>Adminer</a>";
+		return "<a href='https://www.adminer.org/'" . target_blank() . " id='h1'><img src='./static/logo.png' width='24' height='24' alt='' id='logo'>Adminer</a>";
 	}
 
 	/** Connection parameters
@@ -107,8 +107,8 @@ class Adminer {
 	*/
 	function head(?bool $dark = null): bool {
 		// this is matched by compile.php
-		echo "<link rel='stylesheet' href='../externals/jush/jush.css'>\n";
-		echo ($dark !== false ? "<link rel='stylesheet'" . ($dark ? "" : " media='(prefers-color-scheme: dark)'") . " href='../externals/jush/jush-dark.css'>\n" : "");
+		echo "<link rel='stylesheet' href='./externals/jush/jush.css'>\n";
+		echo ($dark !== false ? "<link rel='stylesheet'" . ($dark ? "" : " media='(prefers-color-scheme: dark)'") . " href='./externals/jush/jush-dark.css'>\n" : "");
 		return true;
 	}
 
@@ -1053,13 +1053,13 @@ class Adminer {
 	*/
 	function syntaxHighlighting(array $tables): void {
 		// this is matched by compile.php
-		echo script_src("../externals/jush/modules/jush.js", true);
-		echo script_src("../externals/jush/modules/jush-autocomplete-sql.js", true);
-		echo script_src("../externals/jush/modules/jush-textarea.js", true);
-		echo script_src("../externals/jush/modules/jush-txt.js", true);
-		echo script_src("../externals/jush/modules/jush-js.js", true);
+		echo script_src("./externals/jush/modules/jush.js", true);
+		echo script_src("./externals/jush/modules/jush-autocomplete-sql.js", true);
+		echo script_src("./externals/jush/modules/jush-textarea.js", true);
+		echo script_src("./externals/jush/modules/jush-txt.js", true);
+		echo script_src("./externals/jush/modules/jush-js.js", true);
 		if (support("sql")) {
-			echo script_src("../externals/jush/modules/jush-" . JUSH . ".js", true);
+			echo script_src("./externals/jush/modules/jush-" . JUSH . ".js", true);
 			echo "<script" . nonce() . ">\n";
 			if ($tables) {
 				$links = array();
