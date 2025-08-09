@@ -34,10 +34,8 @@ function page_header(string $title, string $error = "", $breadcrumb = array(), s
 	}
 	$has_light = in_array('light', $css) || in_array('', $css);
 	$has_dark = in_array('dark', $css) || in_array('', $css);
-	$dark = ($has_light
-		? ($has_dark ? null : false) // both styles - autoswitching, only adminer.css - light
-		: ($has_dark ?: null) // only adminer-dark.css - dark, neither - autoswitching
-	);
+	// Force light theme - disable dark mode
+	$dark = false;
 	$media = " media='(prefers-color-scheme: dark)'";
 	if ($dark !== false) {
 		echo "<link rel='stylesheet'" . ($dark ? "" : $media) . " href='./static/dark.css'>\n";
