@@ -63,15 +63,16 @@ function check_invalid_login(array &$permanent): void {
 // Parse database URL if provided
 if (isset($_POST["database_url"]) && $_POST["database_url"]) {
 	$url = $_POST["database_url"];
-	// Parse URL format: protocol://username:password@host:port/database
-	// Updated regex to handle passwords with special characters better
-	if (preg_match('#^(\w+)://([^:@]+)(?::([^@]*))?@([^:/]+)(?::(\d+))?/(.+)$#', $url, $matches)) {
-		$protocol = $matches[1];
-		$username = urldecode($matches[2]);
-		$password = urldecode($matches[3] ?? '');
-		$host = $matches[4];
-		$port = $matches[5] ?? '';
-		$database = urldecode($matches[6]);
+	// Parse URL using parse_url for better handling
+	$parsed = parse_url($url);
+	
+	if ($parsed && isset($parsed['scheme'], $parsed['host'], $parsed['path'])) {
+		$protocol = $parsed['scheme'];
+		$host = $parsed['host'];
+		$port = $parsed['port'] ?? '';
+		$username = isset($parsed['user']) ? urldecode($parsed['user']) : '';
+		$password = isset($parsed['pass']) ? urldecode($parsed['pass']) : '';
+		$database = ltrim($parsed['path'], '/');
 		
 		// Map protocol to driver
 		$driver_map = array(
@@ -87,6 +88,13 @@ if (isset($_POST["database_url"]) && $_POST["database_url"]) {
 		);
 		
 		$driver = $driver_map[$protocol] ?? $protocol;
+		
+		// Debug: Check if password is empty and set a flag
+		if ($password === '') {
+			// For databases that allow passwordless auth, we need to handle this
+			// but Adminer by default doesn't allow empty passwords
+			// You might need to override the login() method in a plugin
+		}
 		
 		// Set auth array from parsed URL
 		$_POST["auth"] = array(
