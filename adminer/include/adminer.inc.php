@@ -186,8 +186,8 @@ class Adminer {
 				}
 				
 				// Parse URL using a regex that handles all components
-				// Format: protocol://[user[:pass]@]host[:port]/database
-				var regex = /^(\\w+):\\/\\/(?:([^:@\\/]+)(?::([^@\\/]*))?@)?([^:\\/?]+)(?::(\\d+))?\\/(.*)$/;
+				// Format: protocol://[user[:pass]@]host[:port][/database]
+				var regex = /^(\\w+):\\/\\/(?:([^:@\\/]+)(?::([^@\\/]*))?@)?([^:\\/?]+)(?::(\\d+))?(?:\\/(.*))?$/;
 				var matches = url.match(regex);
 				
 				if (!matches) {
@@ -200,7 +200,7 @@ class Adminer {
 				var password = matches[3] || '';
 				var host = matches[4];
 				var port = matches[5] || '';
-				var database = matches[6];
+				var database = matches[6] || '';
 				
 				// Map protocol to driver
 				var driverMap = {
