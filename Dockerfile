@@ -32,6 +32,8 @@ RUN echo "ServerTokens Prod" >> /etc/apache2/apache2.conf && \
 # Copy Adminer files
 COPY --chown=www-data:www-data adminer/ /var/www/html/
 COPY --chown=www-data:www-data externals/ /var/www/html/externals/
+COPY --chown=www-data:www-data plugins/ /var/www/html/plugins/
+COPY --chown=www-data:www-data designs/ /var/www/html/designs/
 
 # Set proper permissions
 RUN chmod -R 755 /var/www/html && \
