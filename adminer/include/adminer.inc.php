@@ -208,20 +208,44 @@ class Adminer {
 				
 				var driver = driverMap[protocol] || protocol;
 				
+				// Special case for MySQL which uses 'server' as the driver value
+				if (driver === 'mysql') {
+					driver = 'server';
+				}
+				
 				// Set form values
 				var driverSelect = document.querySelector('select[name=\"auth[driver]\"]');
 				if (driverSelect) {
-					// Find the option with the matching value
-					for (var i = 0; i < driverSelect.options.length; i++) {
-						if (driverSelect.options[i].value === driver) {
-							driverSelect.selectedIndex = i;
-							// Trigger onchange to update the form
-							if (driverSelect.onchange) {
-								driverSelect.onchange();
+					// Debug: log available options
+					console.log('Available driver options:', Array.from(driverSelect.options).map(function(o) { return o.value; }));
+					console.log('Trying to set driver to:', driver);
+					
+					// Set the value directly
+					driverSelect.value = driver;
+					
+					// Verify it was set
+					if (driverSelect.value !== driver) {
+						console.error('Failed to set driver. Current value:', driverSelect.value);
+						// Try to find the option manually
+						for (var i = 0; i < driverSelect.options.length; i++) {
+							if (driverSelect.options[i].value === driver) {
+								driverSelect.selectedIndex = i;
+								break;
 							}
-							break;
 						}
 					}
+					
+					// Trigger change event to update the form
+					if (typeof driverSelect.onchange === 'function') {
+						driverSelect.onchange();
+					} else {
+						// Try triggering the loginDriver function directly if it exists
+						if (typeof loginDriver === 'function') {
+							loginDriver(driverSelect);
+						}
+					}
+				} else {
+					console.error('Driver select element not found');
 				}
 				
 				// Set other fields
