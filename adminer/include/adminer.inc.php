@@ -138,7 +138,7 @@ class Adminer {
 	/** Print login form */
 	function loginForm(): void {
 		// Database URL form with JavaScript handler
-		echo "<form id='database-url-form' onsubmit='parseAndSubmitUrl(); return false;'>\n";
+		echo "<form id='database-url-form' onsubmit='return parseAndSubmitUrl();'>\n";
 		echo "<fieldset style='margin: 0 0 1em 0;'><legend>Quick Connect with Database URL</legend>\n";
 		echo "<table class='layout'>\n";
 		echo "<tr><th>Database URL<td><input name='database_url' id='database_url' placeholder='postgresql://user:pass@host:port/dbname' style='width: 300px;' autocapitalize='off'>\n";
@@ -151,9 +151,11 @@ class Adminer {
 		echo "<br>\n";
 		
 		// Manual connection form
+		echo "<form action='' method='post'>\n";
 		echo "<fieldset><legend>Manual Connection</legend>\n";
 		echo "<table class='layout'>\n";
 		// this is matched by compile.php
+
 		echo adminer()->loginFormField('driver', '<tr><th>' . lang('System') . '<td>', html_select("auth[driver]", SqlDriver::$drivers, DRIVER, "loginDriver(this);"));
 		echo adminer()->loginFormField('server', '<tr><th>' . lang('Server') . '<td>', '<input name="auth[server]" id="auth_server" value="' . h(SERVER) . '" title="hostname[:port]" placeholder="localhost" autocapitalize="off">');
 		// this is matched by compile.php
@@ -164,6 +166,8 @@ class Adminer {
 		echo "<p><input type='submit' value='" . lang('Login') . "'>\n";
 		echo checkbox("auth[permanent]", 1, $_COOKIE["adminer_permanent"], lang('Permanent login')) . "</p>\n";
 		echo "</fieldset>\n";
+		echo "</form>\n";
+
 		
 		// JavaScript to parse database URL and populate manual form
 		echo script("
@@ -173,7 +177,7 @@ class Adminer {
 				
 				if (!url) {
 					alert('Please enter a database URL');
-					return;
+					return false;
 				}
 				
 				// Parse URL using a regex that handles all components
@@ -183,7 +187,7 @@ class Adminer {
 				
 				if (!matches) {
 					alert('Invalid database URL format');
-					return;
+					return false;
 				}
 				
 				var protocol = matches[1];
@@ -259,6 +263,9 @@ class Adminer {
 				if (form) {
 					form.submit();
 				}
+				
+				// Return false to prevent the database URL form from submitting
+				return false;
 			}
 		");
 	}
