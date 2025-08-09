@@ -3,8 +3,6 @@
 *.md
 tests/
 editor/
-designs/
-plugins/
 compile.php
 coverage.php
 lang.php
