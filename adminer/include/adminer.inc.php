@@ -143,7 +143,7 @@ class Adminer {
 		echo "<tr><th>Database URL<td><input name='database_url' id='database_url' placeholder='postgresql://user:pass@host:port/dbname' style='width: 300px;' autocapitalize='off'>\n";
 		echo "<tr><td colspan='2'><small style='color: #777;'>Supports: postgresql://, postgres://, postgre://, mysql://, sqlite://, mssql://</small>\n";
 		echo "</table>\n";
-		echo "<p><input type='submit' value='" . lang('Login') . "' id='url-login-btn'></p>\n";
+		echo "<p><input type='submit' value='" . lang('Login') . "' id='url-login-btn' onclick='return handleUrlLogin()'></p>\n";
 		echo "</fieldset>\n";
 		
 		echo "<br>\n";
@@ -162,6 +162,25 @@ class Adminer {
 		echo "<p><input type='submit' value='" . lang('Login') . "'>\n";
 		echo checkbox("auth[permanent]", 1, $_COOKIE["adminer_permanent"], lang('Permanent login')) . "</p>\n";
 		echo "</fieldset>\n";
+		
+		// JavaScript to handle database URL submission
+		echo script("
+			function handleUrlLogin() {
+				var urlInput = document.getElementById('database_url');
+				if (urlInput && urlInput.value.trim()) {
+					// Clear manual form fields when using database URL
+					var form = urlInput.form;
+					var authFields = ['auth[driver]', 'auth[server]', 'auth[username]', 'auth[password]', 'auth[db]'];
+					authFields.forEach(function(fieldName) {
+						var field = form[fieldName];
+						if (field) {
+							field.disabled = true;
+						}
+					});
+				}
+				return true;
+			}
+		");
 	}
 
 	/** Get login form field

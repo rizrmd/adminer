@@ -64,10 +64,11 @@ function check_invalid_login(array &$permanent): void {
 if (isset($_POST["database_url"]) && $_POST["database_url"]) {
 	$url = $_POST["database_url"];
 	// Parse URL format: protocol://username:password@host:port/database
-	if (preg_match('#^(\w+)://([^:]+):([^@]*)@([^:/]+)(?::(\d+))?/(.+)$#', $url, $matches)) {
+	// Updated regex to handle passwords with special characters better
+	if (preg_match('#^(\w+)://([^:@]+)(?::([^@]*))?@([^:/]+)(?::(\d+))?/(.+)$#', $url, $matches)) {
 		$protocol = $matches[1];
 		$username = urldecode($matches[2]);
-		$password = urldecode($matches[3]);
+		$password = urldecode($matches[3] ?? '');
 		$host = $matches[4];
 		$port = $matches[5] ?? '';
 		$database = urldecode($matches[6]);
