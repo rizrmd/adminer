@@ -60,56 +60,8 @@ function check_invalid_login(array &$permanent): void {
 	}
 }
 
-// Parse database URL if provided
-if (isset($_POST["database_url"]) && $_POST["database_url"]) {
-	$url = $_POST["database_url"];
-	// Parse URL using parse_url for better handling
-	$parsed = parse_url($url);
-	
-	if ($parsed && isset($parsed['scheme'], $parsed['host'], $parsed['path'])) {
-		$protocol = $parsed['scheme'];
-		$host = $parsed['host'];
-		$port = $parsed['port'] ?? '';
-		$username = isset($parsed['user']) ? urldecode($parsed['user']) : '';
-		$password = isset($parsed['pass']) ? urldecode($parsed['pass']) : '';
-		$database = ltrim($parsed['path'], '/');
-		
-		// Map protocol to driver
-		$driver_map = array(
-			'postgresql' => 'pgsql',
-			'postgres' => 'pgsql',
-			'postgre' => 'pgsql',
-			'mysql' => 'mysql',
-			'mariadb' => 'mysql',
-			'sqlite' => 'sqlite',
-			'sqlite3' => 'sqlite',
-			'mssql' => 'mssql',
-			'sqlserver' => 'mssql'
-		);
-		
-		$driver = $driver_map[$protocol] ?? $protocol;
-		
-		// Debug: Check if password is empty and set a flag
-		if ($password === '') {
-			// For databases that allow passwordless auth, we need to handle this
-			// but Adminer by default doesn't allow empty passwords
-			// You might need to override the login() method in a plugin
-		}
-		
-		// Set auth array from parsed URL
-		$_POST["auth"] = array(
-			'driver' => $driver,
-			'server' => $host . ($port ? ':' . $port : ''),
-			'username' => $username,
-			'password' => $password,
-			'db' => $database,
-			'permanent' => $_POST["auth"]["permanent"] ?? ''
-		);
-		
-		// Remove database_url from POST to fix count check
-		unset($_POST["database_url"]);
-	}
-}
+// Database URL is now handled entirely on the client side via JavaScript
+// The JavaScript parses the URL and populates the manual form fields
 
 $auth = $_POST["auth"];
 if ($auth) {
@@ -203,7 +155,7 @@ function auth_error(string $error, array &$permanent) {
 	page_header(lang('Login'), $error, null);
 	echo "<form action='' method='post'>\n";
 	echo "<div>";
-	if (hidden_fields($_POST, array("auth", "database_url", "token"))) { // expired session - exclude login-related fields
+	if (hidden_fields($_POST, array("auth"))) { // expired session
 		echo "<p class='message'>" . lang('The action will be performed after successful login with the same credentials.') . "\n";
 	}
 	echo "</div>\n";

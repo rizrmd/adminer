@@ -137,44 +137,104 @@ class Adminer {
 
 	/** Print login form */
 	function loginForm(): void {
-		// This function is called from auth.inc.php which already wraps it in a form
-		// We'll close that form and create our own forms
-		echo "</form>\n"; // Close the form opened in auth.inc.php
-		
-		// Database URL form - separate form
-		echo "<form action='' method='post'>\n";
+		// Database URL form with JavaScript handler
 		echo "<fieldset style='margin: 0 0 1em 0;'><legend>Quick Connect with Database URL</legend>\n";
 		echo "<table class='layout'>\n";
 		echo "<tr><th>Database URL<td><input name='database_url' id='database_url' placeholder='postgresql://user:pass@host:port/dbname' style='width: 300px;' autocapitalize='off'>\n";
 		echo "<tr><td colspan='2'><small style='color: #777;'>Supports: postgresql://, postgres://, postgre://, mysql://, sqlite://, mssql://</small>\n";
 		echo "</table>\n";
-		echo "<p><input type='submit' value='" . lang('Login') . "' id='url-login-btn'></p>\n";
-		echo input_token(); // Add CSRF token
+		echo "<p><input type='button' value='" . lang('Login') . "' id='url-login-btn' onclick='parseAndSubmitUrl()'></p>\n";
 		echo "</fieldset>\n";
-		echo "</form>\n";
 		
 		echo "<br>\n";
 		
-		// Manual connection form - separate form
-		echo "<form action='' method='post'>\n";
+		// Manual connection form
 		echo "<fieldset><legend>Manual Connection</legend>\n";
 		echo "<table class='layout'>\n";
 		// this is matched by compile.php
 		echo adminer()->loginFormField('driver', '<tr><th>' . lang('System') . '<td>', html_select("auth[driver]", SqlDriver::$drivers, DRIVER, "loginDriver(this);"));
-		echo adminer()->loginFormField('server', '<tr><th>' . lang('Server') . '<td>', '<input name="auth[server]" value="' . h(SERVER) . '" title="hostname[:port]" placeholder="localhost" autocapitalize="off">');
+		echo adminer()->loginFormField('server', '<tr><th>' . lang('Server') . '<td>', '<input name="auth[server]" id="auth_server" value="' . h(SERVER) . '" title="hostname[:port]" placeholder="localhost" autocapitalize="off">');
 		// this is matched by compile.php
 		echo adminer()->loginFormField('username', '<tr><th>' . lang('Username') . '<td>', '<input name="auth[username]" id="username" value="' . h($_GET["username"]) . '" autocomplete="username" autocapitalize="off">' . script("const authDriver = qs('#username').form['auth[driver]']; authDriver && authDriver.onchange();"));
-		echo adminer()->loginFormField('password', '<tr><th>' . lang('Password') . '<td>', '<input type="password" name="auth[password]" autocomplete="current-password">');
-		echo adminer()->loginFormField('db', '<tr><th>' . lang('Database') . '<td>', '<input name="auth[db]" value="' . h($_GET["db"]) . '" autocapitalize="off">');
+		echo adminer()->loginFormField('password', '<tr><th>' . lang('Password') . '<td>', '<input type="password" name="auth[password]" id="auth_password" autocomplete="current-password">');
+		echo adminer()->loginFormField('db', '<tr><th>' . lang('Database') . '<td>', '<input name="auth[db]" id="auth_db" value="' . h($_GET["db"]) . '" autocapitalize="off">');
 		echo "</table>\n";
 		echo "<p><input type='submit' value='" . lang('Login') . "'>\n";
 		echo checkbox("auth[permanent]", 1, $_COOKIE["adminer_permanent"], lang('Permanent login')) . "</p>\n";
-		echo input_token(); // Add CSRF token
 		echo "</fieldset>\n";
-		echo "</form>\n";
 		
-		// Re-open a dummy form to match the closing </form> in auth.inc.php
-		echo "<form style='display:none'>";
+		// JavaScript to parse database URL and populate manual form
+		echo script("
+			function parseAndSubmitUrl() {
+				var urlInput = document.getElementById('database_url');
+				var url = urlInput.value.trim();
+				
+				if (!url) {
+					alert('Please enter a database URL');
+					return;
+				}
+				
+				// Parse URL using a regex that handles all components
+				// Format: protocol://[user[:pass]@]host[:port]/database
+				var regex = /^(\\w+):\\/\\/(?:([^:@\\/]+)(?::([^@\\/]*))?@)?([^:\\/?]+)(?::(\\d+))?\\/(.*)$/;
+				var matches = url.match(regex);
+				
+				if (!matches) {
+					alert('Invalid database URL format');
+					return;
+				}
+				
+				var protocol = matches[1];
+				var username = matches[2] || '';
+				var password = matches[3] || '';
+				var host = matches[4];
+				var port = matches[5] || '';
+				var database = matches[6];
+				
+				// Map protocol to driver
+				var driverMap = {
+					'postgresql': 'pgsql',
+					'postgres': 'pgsql',
+					'postgre': 'pgsql',
+					'mysql': 'mysql',
+					'mariadb': 'mysql',
+					'sqlite': 'sqlite',
+					'sqlite3': 'sqlite',
+					'mssql': 'mssql',
+					'sqlserver': 'mssql'
+				};
+				
+				var driver = driverMap[protocol] || protocol;
+				
+				// Set form values
+				var driverSelect = document.querySelector('select[name=\"auth[driver]\"]');
+				if (driverSelect) {
+					// Find the option with the matching value
+					for (var i = 0; i < driverSelect.options.length; i++) {
+						if (driverSelect.options[i].value === driver) {
+							driverSelect.selectedIndex = i;
+							// Trigger onchange to update the form
+							if (driverSelect.onchange) {
+								driverSelect.onchange();
+							}
+							break;
+						}
+					}
+				}
+				
+				// Set other fields
+				document.getElementById('auth_server').value = host + (port ? ':' + port : '');
+				document.getElementById('username').value = decodeURIComponent(username);
+				document.getElementById('auth_password').value = decodeURIComponent(password);
+				document.getElementById('auth_db').value = decodeURIComponent(database);
+				
+				// Submit the manual form
+				var form = document.getElementById('username').form;
+				if (form) {
+					form.submit();
+				}
+			}
+		");
 	}
 
 	/** Get login form field
