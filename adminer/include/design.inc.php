@@ -33,14 +33,13 @@ function page_header(string $title, string $error = "", $breadcrumb = array(), s
 		$css = array_fill_keys($css, 'light');
 	}
 	$has_light = in_array('light', $css) || in_array('', $css);
-	$has_dark = in_array('dark', $css) || in_array('', $css);
-	// Force light theme - disable dark mode
+	// Dark mode permanently disabled
 	$dark = false;
-	$media = " media='(prefers-color-scheme: dark)'";
-	if ($dark !== false) {
-		echo "<link rel='stylesheet'" . ($dark ? "" : $media) . " href='./static/dark.css'>\n";
+	// Dark mode disabled - no longer processed
+	if (false) {
+		echo "<link rel='stylesheet' href='./static/dark.css'>\n";
 	}
-	echo "<meta name='color-scheme' content='" . ($dark === null ? "light dark" : ($dark ? "dark" : "light")) . "'>\n";
+	echo "<meta name='color-scheme' content='light'>\n";
 
 	// this is matched by compile.php
 	echo script_src("./static/functions.js");
@@ -50,10 +49,7 @@ function page_header(string $title, string $error = "", $breadcrumb = array(), s
 		echo "<link rel='apple-touch-icon' href='./static/logo.png'>\n";
 	}
 	foreach ($css as $url => $mode) {
-		$attrs = ($mode == 'dark' && !$dark
-			? $media
-			: ($mode == 'light' && $has_dark ? " media='(prefers-color-scheme: light)'" : "")
-		);
+		$attrs = "";
 		echo "<link rel='stylesheet'$attrs href='" . h($url) . "'>\n";
 	}
 	echo "\n<body class='" . lang('ltr') . " nojs";

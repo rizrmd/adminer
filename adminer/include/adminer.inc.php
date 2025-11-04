@@ -108,7 +108,7 @@ class Adminer {
 	function head(?bool $dark = null): bool {
 		// this is matched by compile.php
 		echo "<link rel='stylesheet' href='./externals/jush/jush.css'>\n";
-		echo ($dark !== false ? "<link rel='stylesheet'" . ($dark ? "" : " media='(prefers-color-scheme: dark)'") . " href='./externals/jush/jush-dark.css'>\n" : "");
+		echo ($dark !== false ? "<link rel='stylesheet'" . ($dark ? "" : " media='(prefers-color-scheme: dark)'") . " href='./externals/jush/jush.css'>\n" : "");
 		return true;
 	}
 
@@ -122,14 +122,11 @@ class Adminer {
 	*/
 	function css(): array {
 		$return = array();
-		foreach (array("", "-dark") as $mode) {
+		foreach (array("") as $mode) {
 			$filename = "adminer$mode.css";
 			if (file_exists($filename)) {
 				$file = file_get_contents($filename);
-				$return["$filename?v=" . crc32($file)] = ($mode
-					? "dark"
-					: (preg_match('~prefers-color-scheme:\s*dark~', $file) ? '' : 'light')
-				);
+				$return["$filename?v=" . crc32($file)] = 'light';
 			}
 		}
 		return $return;

@@ -16,9 +16,6 @@ if (substr(VERSION, -4) != '-dev') {
 if ($_GET["file"] == "default.css") {
 	header("Content-Type: text/css; charset=utf-8");
 	echo lzw_decompress(compile_file('./static/default.css;./externals/jush/jush.css', 'minify_css'));
-} elseif ($_GET["file"] == "dark.css") {
-	header("Content-Type: text/css; charset=utf-8");
-	echo lzw_decompress(compile_file('./static/dark.css;./externals/jush/jush-dark.css', 'minify_css'));
 } elseif ($_GET["file"] == "functions.js") {
 	header("Content-Type: text/javascript; charset=utf-8");
 	echo lzw_decompress(compile_file('./static/functions.js;./static/editing.js', 'minify_js'));

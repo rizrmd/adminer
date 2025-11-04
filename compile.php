@@ -327,7 +327,8 @@ if ($vendor) {
 	//! strip doc_link() definition
 }
 if ($project == "editor") {
-	$file = preg_replace('~;.\.\/externals/jush/jush(-dark)?\.css~', '', $file);
+	// Dark mode files removed - always light theme
+	$file = preg_replace('~;.\.\/externals/jush/jush\.css~', '', $file);
 	$file = preg_replace('~compile_file\(\'\.\./(externals/jush/modules/jush\.js)[^)]+\)~', "''", $file);
 }
 $file = preg_replace_callback("~(?<!>)lang\\('((?:[^\\\\']+|\\\\.)*)'([,)])~s", 'lang_ids', $file);
@@ -341,7 +342,8 @@ if ($_SESSION["lang"]) {
 }
 $file = str_replace('echo script_src("static/editing.js");' . "\n", "", $file); // merged into functions.js
 $file = preg_replace('~\s+echo script_src\("\.\./externals/jush/modules/jush-(autocomplete-sql|textarea|txt|js|" \. JUSH \. ")\.js", true\);~', '', $file); // merged into jush.js
-$file = preg_replace('~echo .*/jush(-dark)?.css\'>.*~', '', $file); // merged into default.css or dark.css
+// Dark mode files removed - always light theme
+$file = preg_replace('~echo .*/jush.css\'>.*~', '', $file); // merged into default.css
 if (function_exists('stripTypes')) {
 	$file = stripTypes($file);
 }
